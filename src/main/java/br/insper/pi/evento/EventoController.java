@@ -16,10 +16,15 @@ public class EventoController {
     public List<Evento> listar(@RequestParam(required = false) String nome){
         return eventoService.listar(nome);
     }
+//
+//    @PostMapping
+//    public Evento salvar(@RequestBody Evento evento){
+//        return eventoService.salvar(evento);
+//    }
 
     @PostMapping
-    public Evento salvar(@RequestBody Evento evento){
-        return eventoService.salvar(evento);
+    public Evento salvar(@RequestBody Evento evento, @RequestParam String cpf){
+        return eventoService.salvar(evento, cpf);
     }
 
     @PostMapping("/{cpf}")

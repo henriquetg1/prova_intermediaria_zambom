@@ -32,8 +32,7 @@ public class EventoServiceTests {
 
 
     @Test
-    public void TestCadastrarEvento(){
-
+    public void TestCadastrarEvento() {
         Evento evento = new Evento();
         evento.setNome("Evento 1");
         evento.setDescricao("Evento 1");
@@ -44,19 +43,25 @@ public class EventoServiceTests {
         lista.add("123");
         evento.setUsuarios(lista);
 
+        // Mocking the usuarioService to return a successful response
+        RetornarUsuarioDTO usuarioMock = new RetornarUsuarioDTO();
+        Mockito.when(usuarioService.getUsuario("90210"))
+                .thenReturn(ResponseEntity.ok(usuarioMock));
+
         Mockito.when(eventoRepository.save(Mockito.any(Evento.class))).thenReturn(evento);
 
-        Evento retorno = eventoService.salvar(evento);
+        // Chamada do método 'salvar' com o CPF do criador
+        Evento retorno = eventoService.salvar(evento, evento.getCpfCriador());
 
-        // Verify the results
+        // Verifica os resultados
         Assertions.assertNotNull(retorno);
         Assertions.assertEquals("Evento 1", retorno.getNome());
         Assertions.assertEquals("Evento 1", retorno.getDescricao());
         Assertions.assertEquals(10, retorno.getMaxConvidados());
         Assertions.assertEquals("90210", retorno.getCpfCriador());
         Assertions.assertEquals(lista, retorno.getUsuarios());
-
     }
+
 
     @Test
     public void testListarEventosNome(){
@@ -115,20 +120,21 @@ public class EventoServiceTests {
     }
 
     @Test
-    public void testSalvarEventoNotSuccessful(){
-
+    public void testSalvarEventoNotSuccessful() {
         Evento evento = new Evento();
         evento.setId("1");
+        evento.setCpfCriador("90210"); // Adicione o CPF do criador do evento
 
-        RetornarUsuarioDTO usuarioDTO = new RetornarUsuarioDTO();
-        ResponseEntity<RetornarUsuarioDTO> responseEntity = new ResponseEntity<>(usuarioDTO, HttpStatus.NOT_FOUND);
+        // Mockando a resposta do usuarioService para retornar NOT_FOUND
+        ResponseEntity<RetornarUsuarioDTO> responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Mockito.when(usuarioService.getUsuario(evento.getCpfCriador())).thenReturn(responseEntity);
 
-
+        // Verifica se uma RuntimeException é lançada ao tentar salvar
         Assertions.assertThrows(RuntimeException.class, () -> {
-            eventoService.salvar(evento);
+            eventoService.salvar(evento, evento.getCpfCriador());
         });
-
     }
+
 
     @Test
     public void testAddAlunoEventoNotSuccessful() {
@@ -150,6 +156,7 @@ public class EventoServiceTests {
         Evento evento = new Evento();
         evento.setNome("Matheus Pereira");
         evento.setMaxConvidados(26);
+        evento.setCpfCriador("123"); // Adicionando o CPF do criador
         evento.setId("1");
 
         ArrayList<String> lista = new ArrayList<>();
@@ -158,13 +165,14 @@ public class EventoServiceTests {
 
         // Simulando o retorno do usuário não encontrado (status NOT_FOUND)
         ResponseEntity<RetornarUsuarioDTO> responseEntity = new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        Mockito.when(usuarioService.getUsuario("123")).thenReturn(responseEntity);
+        Mockito.when(usuarioService.getUsuario(evento.getCpfCriador())).thenReturn(responseEntity);
 
         // Verificando se a exceção é lançada
         Assertions.assertThrows(RuntimeException.class, () -> {
-            eventoService.salvar(evento);
+            eventoService.salvar(evento, evento.getCpfCriador()); // Passando o CPF
         });
     }
+
 
 }
 

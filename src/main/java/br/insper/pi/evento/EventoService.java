@@ -20,19 +20,7 @@ public class EventoService {
     @Autowired
     private UsuarioService usuarioService;
 
-//    public Evento salvar(Evento evento, String cpf){
-//        ResponseEntity<RetornarUsuarioDTO> usuario = usuarioService.getUsuario(cpf);
-//        if(usuario.getStatusCode().is2xxSuccessful()){
-//            return eventoRepository.save(evento);
-//        }
-//        else {
-//            throw new RuntimeException("Usuário não encontrado");
-//        }
-//    }
-
-    public Evento salvar(Evento evento){
-        //TODO: Checagens
-        String cpf = evento.getCpfCriador(); // cpf do criador do evento
+    public Evento salvar(Evento evento, String cpf){
         ResponseEntity<RetornarUsuarioDTO> usuario = usuarioService.getUsuario(cpf);
         if(usuario.getStatusCode().is2xxSuccessful()){
             return eventoRepository.save(evento);
@@ -41,6 +29,18 @@ public class EventoService {
             throw new RuntimeException("Usuário não encontrado");
         }
     }
+
+//    public Evento salvar(Evento evento){
+//        //TODO: Checagens
+//        String cpf = evento.getCpfCriador(); // cpf do criador do evento
+//        ResponseEntity<RetornarUsuarioDTO> usuario = usuarioService.getUsuario(cpf);
+//        if(usuario.getStatusCode().is2xxSuccessful()){
+//            return eventoRepository.save(evento);
+//        }
+//        else {
+//            throw new RuntimeException("Usuário não encontrado");
+//        }
+//    }
 
     // listar todos com os eventos com opção de filtro por nome
     public List<Evento> listar(String nome){
