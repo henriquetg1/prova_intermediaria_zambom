@@ -173,6 +173,41 @@ public class EventoServiceTests {
         });
     }
 
+    // teste adicionar aluno
+    @Test
+    public void testAddAlunoEvento() {
+        Evento evento = new Evento();
+        evento.setId("1");
+        evento.setNome("Evento 1");
+        evento.setDescricao("Evento 1");
+        evento.setMaxConvidados(10);
+        evento.setCpfCriador("90210");
+
+        ArrayList<String> lista = new ArrayList<>();
+        lista.add("123");
+        evento.setUsuarios(lista);
+
+        // Mocking the usuarioService to return a successful response
+        RetornarUsuarioDTO usuarioMock = new RetornarUsuarioDTO();
+        Mockito.when(usuarioService.getUsuario("123"))
+                .thenReturn(ResponseEntity.ok(usuarioMock));
+
+        Mockito.when(eventoRepository.findById("1")).thenReturn(java.util.Optional.of(evento));
+
+        Mockito.when(eventoRepository.save(Mockito.any(Evento.class))).thenReturn(evento);
+
+        // Chamada do método 'salvar' com o CPF do criador
+        Evento retorno = eventoService.addAluno(evento, "123");
+
+        // Verifica os resultados
+        Assertions.assertNotNull(retorno);
+        Assertions.assertEquals("Evento 1", retorno.getNome());
+        Assertions.assertEquals("Evento 1", retorno.getDescricao());
+        Assertions.assertEquals(10, retorno.getMaxConvidados());
+        Assertions.assertEquals("90210", retorno.getCpfCriador());
+        Assertions.assertEquals(lista, retorno.getUsuarios());
+    }
+
 
 }
 
